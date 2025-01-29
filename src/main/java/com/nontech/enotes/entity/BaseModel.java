@@ -18,8 +18,8 @@ import lombok.ToString;
 @MappedSuperclass
 public class BaseModel {
 
-	private boolean isActive;
-	private boolean isDeleted;
+	private Boolean isActive;
+	private Boolean isDeleted;
 	private Integer createdBy;
 	private Date createdOn;
 	private Integer updatedBy;
