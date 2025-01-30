@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import com.nontech.enotes.exception.ExistsDataException;
 import com.nontech.enotes.exception.ResourceNotFoundException;
 import com.nontech.enotes.util.Validation;
 import org.modelmapper.ModelMapper;
@@ -32,12 +33,19 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public boolean saveCategory(CategoryDto categoryDto) {
+        // Validation checking
         validation.categoryValidation(categoryDto);
+        // Check category exist or not
+        Boolean exist = categoryRepo.existsByName(categoryDto.getName().trim());
+        if (exist) {
+            // Throw error
+            throw new ExistsDataException("Category already exists");
+        }
         Category category = modelMapper.map(categoryDto, Category.class);
         if (ObjectUtils.isEmpty(category.getId())) {
             category.setIsDeleted(false);
-            category.setCreatedBy(1);
-            category.setCreatedOn(new Date());
+//            category.setCreatedBy(1);
+//            category.setCreatedOn(new Date());
         } else {
             updateCategory(category);
         }
@@ -57,8 +65,8 @@ public class CategoryServiceImpl implements CategoryService {
             category.setCreatedBy(existingCategory.getCreatedBy());
             category.setCreatedOn(existingCategory.getCreatedOn());
             category.setIsDeleted(existingCategory.getIsDeleted());
-            category.setUpdatedBy(1);
-            category.setUpdatedOn(new Date());
+//            category.setUpdatedBy(1);
+//            category.setUpdatedOn(new Date());
         }
     }
 
