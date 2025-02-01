@@ -22,9 +22,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
+import org.springframework.util.StreamUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -74,10 +76,10 @@ public class NotesServiceImpl implements NotesService {
             String originalFilename = file.getOriginalFilename();
             String extension = FilenameUtils.getExtension(originalFilename);
 
-            List<String> extensionAllow = Arrays.asList(".pdf",".xlx",".jpg");
+            List<String> extensionAllow = Arrays.asList("pdf","xlx","jpg","png","docs");
             if(!extensionAllow.contains(extension))
             {
-                throw new IllegalArgumentException("Invalid file format ! We can upload only .pdf, .xlx, .jpg");
+                throw new IllegalArgumentException("Invalid file format ! We can upload only .pdf, .xlx, .jpg, .png, .docs");
             }
 
             String randomString = UUID.randomUUID().toString();
@@ -128,5 +130,20 @@ public class NotesServiceImpl implements NotesService {
     @Override
     public List<NotesDto> getAllNotes() {
         return notesRepo.findAll().stream().map(note -> mapper.map(note, NotesDto.class)).toList();
+    }
+
+    @Override
+    public byte[] downLoadFile(FileDetails fileDetails) throws ResourceNotFoundException, IOException {
+
+        FileInputStream io = new FileInputStream(fileDetails.getPath());
+
+        return StreamUtils.copyToByteArray(io);
+    }
+
+    @Override
+    public FileDetails getFileDetails(Integer id) throws ResourceNotFoundException {
+        FileDetails fileDetails = fileDetailsRepo.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("File is not available ith id: " + id));
+        return fileDetails;
     }
 }

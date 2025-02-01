@@ -8,7 +8,9 @@
 package com.nontech.enotes.util;
 
 import com.nontech.enotes.payloads.GenericResponse;
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 public class CommonUtil {
@@ -48,5 +50,26 @@ public class CommonUtil {
                 .message(message)
                 .build();
         return response.create();
+    }
+
+    public static String getContentType(String originalFileName) {
+        String extension = FilenameUtils.getExtension(originalFileName);
+        switch (extension) {
+            case "pdf":
+                return "application/pdf";
+            case "xls":
+            case "xlsx":
+                return "application/vnd.ms-excel";
+            case "txt":
+                return "text/plain";
+            case "png":
+                return "image/png";
+            case "jpeg":
+            case "jpg":
+                return "image/jpeg";
+            default:
+                return "application/octet-stream"; // Default for unknown file types
+        }
+
     }
 }

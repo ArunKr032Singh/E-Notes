@@ -2,16 +2,21 @@ package com.nontech.enotes.controller;
 
 import com.nontech.enotes.dto.CategoryDto;
 import com.nontech.enotes.dto.NotesDto;
+import com.nontech.enotes.entity.FileDetails;
+import com.nontech.enotes.exception.ResourceNotFoundException;
 import com.nontech.enotes.service.NotesService;
 import com.nontech.enotes.util.CommonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @Slf4j
@@ -24,12 +29,24 @@ public class NotesController {
     @PostMapping("/save")
     public ResponseEntity<?> saveNotes(@RequestParam String notes, @RequestParam(required = false) MultipartFile file) throws Exception {
 
-        Boolean saveNotes = notesService.saveNotes(notes,file);
+        Boolean saveNotes = notesService.saveNotes(notes, file);
         if (saveNotes) {
             return CommonUtil.createBuildResponseMessage("Saved notes", HttpStatus.CREATED);
         } else {
             return CommonUtil.createErrorResponseMessage("Not saved", HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @GetMapping("/download/{id}")
+    public ResponseEntity<?> downloadFile(@PathVariable Integer id) throws Exception {
+        FileDetails fileDetails = notesService.getFileDetails(id);
+        byte[] downloadFile = notesService.downLoadFile(fileDetails);
+        HttpHeaders httpHeaders = new HttpHeaders();
+        String contentType = CommonUtil.getContentType(fileDetails.getOriginalFileName());
+        httpHeaders.setContentType(MediaType.parseMediaType(contentType));
+        httpHeaders.setContentDispositionFormData("attachment", fileDetails.getOriginalFileName());
+
+        return ResponseEntity.ok().headers(httpHeaders).body(downloadFile);
     }
 
     @GetMapping("/")
