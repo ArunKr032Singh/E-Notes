@@ -2,6 +2,7 @@ package com.nontech.enotes.controller;
 
 import com.nontech.enotes.dto.CategoryDto;
 import com.nontech.enotes.dto.NotesDto;
+import com.nontech.enotes.dto.response.NotesResponse;
 import com.nontech.enotes.entity.FileDetails;
 import com.nontech.enotes.exception.ResourceNotFoundException;
 import com.nontech.enotes.service.NotesService;
@@ -59,16 +60,17 @@ public class NotesController {
         }
     }
 
-//    @GetMapping("/active")
-//    public ResponseEntity<?> getActiveCategory() {
-//        List<CategoryResponse> categoryDtoList = categoryService.getActiveCategory();
-//        if (CollectionUtils.isEmpty(categoryDtoList)) {
+    @GetMapping("/user-notes")
+    public ResponseEntity<?> getAllNotesByUser(@RequestParam(name = "pageNo", defaultValue = "0") Integer pageNo,
+                                               @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize) {
+        Integer userId = 2;
+        NotesResponse notes = notesService.getAllNotesByUser(userId,pageNo,pageSize);
+//        if (CollectionUtils.isEmpty(notesDtoList)) {
 //            return ResponseEntity.noContent().build();
-//        } else {
-////            return new ResponseEntity<>(categoryDtoList, HttpStatus.OK);
-//            return CommonUtil.createBuildResponse(categoryDtoList, HttpStatus.OK);
 //        }
-//    }
+        return CommonUtil.createBuildResponse(notes, HttpStatus.OK);
+
+    }
 
 //    @GetMapping("/{id}")
 //    public ResponseEntity<?> getCategoryDetailsById(@PathVariable Integer id) throws Exception {

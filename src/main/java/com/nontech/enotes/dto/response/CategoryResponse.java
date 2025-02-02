@@ -1,4 +1,4 @@
-package com.nontech.enotes.dto;
+package com.nontech.enotes.dto.response;
 
 import lombok.*;
 

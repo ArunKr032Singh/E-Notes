@@ -56,7 +56,7 @@ public class NotesDto {
     @AllArgsConstructor
     public static class CategoryDto{
         private Integer id;
-        private String title;
+        private String name;
     }
 
 }
