@@ -8,6 +8,7 @@
 package com.nontech.enotes.util;
 
 import com.nontech.enotes.payloads.GenericResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -70,6 +71,11 @@ public class CommonUtil {
             default:
                 return "application/octet-stream"; // Default for unknown file types
         }
+    }
 
+    public static String getUrl(HttpServletRequest request) {
+        String apiUrl = request.getRequestURL().toString().replace(request.getServletPath(),"");
+        System.out.println(apiUrl);
+        return apiUrl;
     }
 }

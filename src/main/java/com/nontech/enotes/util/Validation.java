@@ -9,8 +9,10 @@ package com.nontech.enotes.util;
 
 import com.nontech.enotes.dto.CategoryDto;
 import com.nontech.enotes.dto.UserDto;
+import com.nontech.enotes.exception.ExistsDataException;
 import com.nontech.enotes.exception.ValidationException;
 import com.nontech.enotes.repository.RoleRepo;
+import com.nontech.enotes.repository.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -25,6 +27,9 @@ import java.util.Map;
 public class Validation {
     @Autowired
     private RoleRepo roleRepo;
+
+    @Autowired
+    private UserRepo userRepo;
 
     public void categoryValidation(CategoryDto categoryDto) {
         Map<String, String> error = new HashMap<>();
@@ -76,6 +81,13 @@ public class Validation {
 
         if (!StringUtils.hasText(userDto.getEmail()) || !userDto.getEmail().matches(Constatnts.EMAIL_REGEX)) {
             throw new IllegalArgumentException("Email is invalid");
+        }else{
+            // valid emal exist
+            Boolean existEmail = userRepo.existsByEmail(userDto.getEmail());
+            if(existEmail)
+            {
+                throw new ExistsDataException("Email already exist");
+            }
         }
 
         if (!StringUtils.hasText(userDto.getMobNo()) || !userDto.getMobNo().matches(Constatnts.MOBNO_REGEX)) {

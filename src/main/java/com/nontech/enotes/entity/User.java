@@ -27,10 +27,13 @@ public class User {
     private String firstName;
     private String lastName;
     private String email;
-    private String password;
     private String mobNo;
+    private String password;
 
     @OneToMany(cascade = CascadeType.ALL)
     private List<Role> roles;
 
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "status_id")
+    private AccountStatus status;
 }

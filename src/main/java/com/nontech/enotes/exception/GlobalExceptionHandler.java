@@ -67,4 +67,10 @@ public class GlobalExceptionHandler {
         log.error("GlobalExceptionHandler : handleIllegalArgumentException :", ex.getMessage());
         return CommonUtil.createErrorResponseMessage(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(SuccessException.class)
+    public ResponseEntity<?> handleIllegalArgumentException(SuccessException ex) {
+        log.error("GlobalExceptionHandler : handleSuccessException :", ex.getMessage());
+        return CommonUtil.createBuildResponseMessage(ex.getMessage(), HttpStatus.OK);
+    }
 }
