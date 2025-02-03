@@ -8,15 +8,24 @@
 package com.nontech.enotes.util;
 
 import com.nontech.enotes.dto.CategoryDto;
+import com.nontech.enotes.dto.UserDto;
 import com.nontech.enotes.exception.ValidationException;
+import com.nontech.enotes.repository.RoleRepo;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Component
 public class Validation {
+    @Autowired
+    private RoleRepo roleRepo;
+
     public void categoryValidation(CategoryDto categoryDto) {
         Map<String, String> error = new HashMap<>();
         if (ObjectUtils.isEmpty(categoryDto)) {
@@ -53,6 +62,35 @@ public class Validation {
 
         if (!error.isEmpty()) {
             throw new ValidationException(error);
+        }
+    }
+
+    public void userValidation(UserDto userDto) {
+        if (!StringUtils.hasText(userDto.getFirstName())) {
+            throw new IllegalArgumentException("First name is invalid");
+        }
+
+        if (!StringUtils.hasText(userDto.getLastName())) {
+            throw new IllegalArgumentException("Last name is invalid");
+        }
+
+        if (!StringUtils.hasText(userDto.getEmail()) || !userDto.getEmail().matches(Constatnts.EMAIL_REGEX)) {
+            throw new IllegalArgumentException("Email is invalid");
+        }
+
+        if (!StringUtils.hasText(userDto.getMobNo()) || !userDto.getMobNo().matches(Constatnts.MOBNO_REGEX)) {
+            throw new IllegalArgumentException("Mob No is invalid");
+        }
+
+        if (CollectionUtils.isEmpty(userDto.getRoles())) {
+            throw new IllegalArgumentException("Role is invalid");
+        } else {
+            List<Integer> roleIds = roleRepo.findAll().stream().map(role -> role.getId()).toList();
+            List<Integer> invalidReqRoleIds = userDto.getRoles().stream().map(role ->
+                    role.getId()).filter(roleId -> !roleIds.contains(roleId)).toList();
+            if (!CollectionUtils.isEmpty(invalidReqRoleIds)) {
+                throw new IllegalArgumentException("Role is invalid" + invalidReqRoleIds);
+            }
         }
     }
 }
