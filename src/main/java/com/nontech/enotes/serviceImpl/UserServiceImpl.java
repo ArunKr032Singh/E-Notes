@@ -7,8 +7,12 @@
 
 package com.nontech.enotes.serviceImpl;
 
+import com.nontech.enotes.config.security.CustomUserDetails;
+import com.nontech.enotes.config.security.UserDetailsServiceImpl;
 import com.nontech.enotes.dto.EmailRequest;
 import com.nontech.enotes.dto.UserDto;
+import com.nontech.enotes.dto.request.LoginRequest;
+import com.nontech.enotes.dto.response.LoginResponse;
 import com.nontech.enotes.entity.AccountStatus;
 import com.nontech.enotes.entity.Role;
 import com.nontech.enotes.entity.User;
@@ -18,6 +22,10 @@ import com.nontech.enotes.service.UserService;
 import com.nontech.enotes.util.Validation;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
@@ -42,6 +50,12 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private EmailService emailService;
 
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private BCryptPasswordEncoder passwordEncoder;
+
     @Override
     public Boolean register(UserDto userDto, String url) throws Exception {
         validation.userValidation(userDto);
@@ -53,10 +67,11 @@ public class UserServiceImpl implements UserService {
                 .verificationCode(UUID.randomUUID().toString())
                 .build();
         user.setStatus(status);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         User savedUser = userRepo.save(user);
         if (!ObjectUtils.isEmpty(savedUser)) {
             // send email
-            sendEmail(savedUser,url);
+            sendEmail(savedUser, url);
             return true;
         }
         return false;
@@ -70,7 +85,7 @@ public class UserServiceImpl implements UserService {
                 + "Thanks, <br>"
                 + "Enotes.com";
         message = message.replace("[[username]]", savedUser.getFirstName());
-        message = message.replace("[[url]]", url+"/api/v1/home/verify?uid=" + savedUser.getId() + "&&code=" + savedUser.getStatus().getVerificationCode());
+        message = message.replace("[[url]]", url + "/api/v1/home/verify?uid=" + savedUser.getId() + "&&code=" + savedUser.getStatus().getVerificationCode());
         EmailRequest emailRequest = EmailRequest.builder()
                 .to(savedUser.getEmail())
                 .title("Account creating conformation")
@@ -84,5 +99,23 @@ public class UserServiceImpl implements UserService {
         List<Integer> reqRoleId = userDto.getRoles().stream().map(roleDto -> roleDto.getId()).toList();
         List<Role> roles = roleRepo.findAllById(reqRoleId);
         user.setRoles(roles);
+    }
+
+    @Override
+    public LoginResponse loginUser(LoginRequest loginRequest) {
+        Authentication authenticate = authenticationManager
+                .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
+        if (authenticate.isAuthenticated()) {
+            CustomUserDetails customUserDetails = (CustomUserDetails) authenticate.getPrincipal();
+
+            String token = "ksjdhkjhdfskjhsf";
+
+            LoginResponse loginResponse = LoginResponse.builder()
+                    .userDto(mapper.map(customUserDetails.getUser(), UserDto.class))
+                    .token(token)
+                    .build();
+            return loginResponse;
+        }
+        return null;
     }
 }

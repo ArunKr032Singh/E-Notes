@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -72,5 +73,11 @@ public class GlobalExceptionHandler {
     public ResponseEntity<?> handleIllegalArgumentException(SuccessException ex) {
         log.error("GlobalExceptionHandler : handleSuccessException :", ex.getMessage());
         return CommonUtil.createBuildResponseMessage(ex.getMessage(), HttpStatus.OK);
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<?> handleBadCredentialsException(BadCredentialsException ex) {
+        log.error("GlobalExceptionHandler : handleBadCredentialsException :", ex.getMessage());
+        return CommonUtil.createErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 }
