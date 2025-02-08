@@ -16,6 +16,7 @@ import com.nontech.enotes.dto.response.LoginResponse;
 import com.nontech.enotes.entity.AccountStatus;
 import com.nontech.enotes.entity.Role;
 import com.nontech.enotes.entity.User;
+import com.nontech.enotes.jwt.JwtService;
 import com.nontech.enotes.repository.RoleRepo;
 import com.nontech.enotes.repository.UserRepo;
 import com.nontech.enotes.service.UserService;
@@ -55,6 +56,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
+
+    @Autowired
+    private JwtService jwtService;
 
     @Override
     public Boolean register(UserDto userDto, String url) throws Exception {
@@ -108,7 +112,7 @@ public class UserServiceImpl implements UserService {
         if (authenticate.isAuthenticated()) {
             CustomUserDetails customUserDetails = (CustomUserDetails) authenticate.getPrincipal();
 
-            String token = "ksjdhkjhdfskjhsf";
+            String token = jwtService.generateToken(customUserDetails.getUser());
 
             LoginResponse loginResponse = LoginResponse.builder()
                     .userDto(mapper.map(customUserDetails.getUser(), UserDto.class))

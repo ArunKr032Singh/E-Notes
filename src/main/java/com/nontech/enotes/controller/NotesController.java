@@ -13,6 +13,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -51,7 +52,8 @@ public class NotesController {
     }
 
     @GetMapping("/")
-    public ResponseEntity<?> getAllCategory() {
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> getAllNotes() {
         List<NotesDto> notesDtos = notesService.getAllNotes();
         if (CollectionUtils.isEmpty(notesDtos)) {
             return ResponseEntity.noContent().build();
@@ -61,6 +63,7 @@ public class NotesController {
     }
 
     @GetMapping("/user-notes")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<?> getAllNotesByUser(@RequestParam(name = "pageNo", defaultValue = "0") Integer pageNo,
                                                @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize) {
         Integer userId = 2;
