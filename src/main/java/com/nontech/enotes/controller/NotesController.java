@@ -52,7 +52,7 @@ public class NotesController {
     }
 
     @GetMapping("/")
-    @PreAuthorize("hasRole('ADMIN')")
+//    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> getAllNotes() {
         List<NotesDto> notesDtos = notesService.getAllNotes();
         if (CollectionUtils.isEmpty(notesDtos)) {
@@ -63,7 +63,7 @@ public class NotesController {
     }
 
     @GetMapping("/user-notes")
-    @PreAuthorize("hasRole('USER')")
+//    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<?> getAllNotesByUser(@RequestParam(name = "pageNo", defaultValue = "0") Integer pageNo,
                                                @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize) {
         Integer userId = 2;

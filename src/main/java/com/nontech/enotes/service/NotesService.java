@@ -7,6 +7,7 @@ import com.nontech.enotes.exception.ResourceNotFoundException;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+
 import java.util.List;
 
 public interface NotesService {
@@ -20,4 +21,5 @@ public interface NotesService {
     FileDetails getFileDetails(Integer id) throws ResourceNotFoundException;
 
     NotesResponse getAllNotesByUser(Integer userId, Integer pageNo, Integer pageSize);
+
 }

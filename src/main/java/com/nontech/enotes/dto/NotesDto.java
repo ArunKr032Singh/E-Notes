@@ -7,8 +7,6 @@
 
 package com.nontech.enotes.dto;
 
-import com.nontech.enotes.entity.Category;
-import com.nontech.enotes.entity.FileDetails;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -38,13 +36,13 @@ public class NotesDto {
 
     private Date updatedOn;
 
-    private FileDtoo fileDetails;
+    private FilesDto fileDetails;
 
     @Getter
     @Setter
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class FileDtoo{
+    public static class FilesDto {
         private Integer id;
         private String originalFileName;
         private String displayFileName;
