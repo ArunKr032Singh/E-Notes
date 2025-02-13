@@ -22,4 +22,13 @@ public interface NotesService {
 
     NotesResponse getAllNotesByUser(Integer userId, Integer pageNo, Integer pageSize);
 
+    boolean sofDeleteNote(Integer id) throws ResourceNotFoundException;
+
+    boolean restoreNotes(Integer id) throws ResourceNotFoundException;
+
+    List<NotesDto> restoreUserNotesFromRecycleBin(Integer userId);
+
+    void hardDeleteNotes(Integer id) throws ResourceNotFoundException;
+
+    void emptyRecycleBin(int userId);
 }

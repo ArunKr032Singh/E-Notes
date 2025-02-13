@@ -1,6 +1,5 @@
 package com.nontech.enotes.controller;
 
-import com.nontech.enotes.dto.CategoryDto;
 import com.nontech.enotes.dto.NotesDto;
 import com.nontech.enotes.dto.response.NotesResponse;
 import com.nontech.enotes.entity.FileDetails;
@@ -13,12 +12,10 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
 
 @Slf4j
@@ -67,7 +64,7 @@ public class NotesController {
     public ResponseEntity<?> getAllNotesByUser(@RequestParam(name = "pageNo", defaultValue = "0") Integer pageNo,
                                                @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize) {
         Integer userId = 2;
-        NotesResponse notes = notesService.getAllNotesByUser(userId,pageNo,pageSize);
+        NotesResponse notes = notesService.getAllNotesByUser(userId, pageNo, pageSize);
 //        if (CollectionUtils.isEmpty(notesDtoList)) {
 //            return ResponseEntity.noContent().build();
 //        }
@@ -75,29 +72,46 @@ public class NotesController {
 
     }
 
-//    @GetMapping("/{id}")
-//    public ResponseEntity<?> getCategoryDetailsById(@PathVariable Integer id) throws Exception {
-//
-//
-//        CategoryDto categoryDto = categoryService.getCategyById(id);
-//        if (ObjectUtils.isEmpty(categoryDto)) {
-////            return new ResponseEntity<>("Internal Server Error", HttpStatus.NOT_FOUND);
-//            return CommonUtil.createErrorResponseMessage("Internal Server Error", HttpStatus.NOT_FOUND);
-//        }
-////        return new ResponseEntity<>(categoryDto, HttpStatus.OK);
-//        return CommonUtil.createBuildResponse(categoryDto, HttpStatus.OK);
-//    }
+    @GetMapping("delete/{id}")
+    public ResponseEntity<?> deleteNotes(@PathVariable Integer id) throws ResourceNotFoundException {
+        boolean deleted = notesService.sofDeleteNote(id);
+        if (deleted) {
+            return CommonUtil.createBuildResponse("Notes deleted success", HttpStatus.OK);
+        }
+        return CommonUtil.createErrorResponseMessage("Notes not deleted ", HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 
-//    @DeleteMapping("/{id}")
-//    public ResponseEntity<?> deleteCategoryById(@PathVariable Integer id) {
-//        boolean deleted = categoryService.deleteCategyById(id);
-//        if (deleted) {
-////            return new ResponseEntity<>("Category deleted", HttpStatus.OK);
-//            return CommonUtil.createBuildResponse("Category deleted success",HttpStatus.OK);
-//        }
-////        return new ResponseEntity<>("Category not deleted ", HttpStatus.INTERNAL_SERVER_ERROR);
-//        return CommonUtil.createErrorResponseMessage("Category not deleted ", HttpStatus.INTERNAL_SERVER_ERROR);
-//    }
+    @GetMapping("restore/{id}")
+    public ResponseEntity<?> restoreNotes(@PathVariable Integer id) throws ResourceNotFoundException {
+        boolean restored = notesService.restoreNotes(id);
+        if (restored) {
+            return CommonUtil.createBuildResponse("Notes restored success", HttpStatus.OK);
+        }
+        return CommonUtil.createErrorResponseMessage("Notes not restored", HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @GetMapping("recycle-bin")
+    public ResponseEntity<?> restoreUserNotesFromRecycle() throws ResourceNotFoundException {
+        Integer userId = 2;
+        List<NotesDto> notes = notesService.restoreUserNotesFromRecycleBin(userId);
+        if (CollectionUtils.isEmpty(notes)) {
+            return CommonUtil.createBuildResponseMessage("Notes not available in recycle bin", HttpStatus.OK);
+        }
+        return CommonUtil.createBuildResponse(notes, HttpStatus.OK);
+    }
+
+    @DeleteMapping("delete/{id}")
+    public ResponseEntity<?> hardDeleteNotes(@PathVariable Integer id) throws ResourceNotFoundException {
+        notesService.hardDeleteNotes(id);
+        return CommonUtil.createBuildResponse("Notes deleted success", HttpStatus.OK);
+    }
+
+    @DeleteMapping("empty-recycle-bin")
+    public ResponseEntity<?> emptyRecycleBin() throws ResourceNotFoundException {
+        int userId =2;
+        notesService.emptyRecycleBin(userId);
+        return CommonUtil.createBuildResponse("Notes deleted success", HttpStatus.OK);
+    }
 
 
 }

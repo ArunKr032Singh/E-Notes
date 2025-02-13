@@ -25,7 +25,7 @@ public class CategoryController {
     private CategoryService categoryService;
 
     @PostMapping("/save")
-    @PreAuthorize("hasRole('ADMIN')")
+//    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> saveCategory(@RequestBody CategoryDto categoryDto) {
 
         Boolean savedCategory = categoryService.saveCategory(categoryDto);
